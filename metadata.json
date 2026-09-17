@@ -1,0 +1,6 @@
+{
+  "name": "YuE2 Music Studio",
+  "description": "Frontier symbolic and audio music generation studio powered by YuE2 with editable ABC sheet music, zero-shot covers, and WildSongBench evaluation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
