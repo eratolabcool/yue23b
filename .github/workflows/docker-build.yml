@@ -1,0 +1,31 @@
+# ============================================================
+# [INPUT]: 依赖仓库根目录的 Dockerfile、.dockerignore、handler.py
+# [OUTPUT]: 构建并推送 ghcr.io/eratolabcool/yue2-serverless:latest
+# [POS]: .github/workflows 的镜像构建流水线，供 RunPod serverless 部署消费
+# [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+# ============================================================
+name: Build RunPod Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/eratolabcool/yue2-serverless:latest
