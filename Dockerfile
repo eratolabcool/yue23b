@@ -13,7 +13,7 @@ COPY . .
 # Install the yue2 package (pulls torch==2.10.0 CUDA build, transformers, soundfile,
 # etc. from pyproject.toml) plus the RunPod SDK, which provides
 # runpod.serverless.start({"handler": handler}).
-RUN python3.11 -m pip install --no-cache-dir . runpod
+RUN python3.11 -m pip install --no-cache-dir . runpod hf_transfer
 
 # RunPod serverless runs this command; handler.py loads the YuE2 model from
 # Hugging Face at first start and calls runpod.serverless.start().
