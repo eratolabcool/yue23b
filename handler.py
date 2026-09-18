@@ -1,5 +1,4 @@
 import runpod
-import torch
 import soundfile as sf
 import base64
 import io
@@ -7,7 +6,7 @@ from yue2 import YuE2Pipeline
 
 # 冷启动时加载模型
 print("Loading YuE2-3B model...")
-pipe = YuE2Pipeline.from_pretrained("m-a-p/YuE2-3B", device="cuda", torch_dtype=torch.bfloat16)
+pipe = YuE2Pipeline.from_pretrained("m-a-p/YuE2-3B", device="cuda")
 
 def handler(job):
     job_input = job.get('input', {})

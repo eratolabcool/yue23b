@@ -40,4 +40,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/eratolabcool/yue2-serverless:latest
-            ghcr.io/eratolabcool/yue2-serverless:v1.1
+            ghcr.io/eratolabcool/yue2-serverless:v1.2
