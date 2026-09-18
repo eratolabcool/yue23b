@@ -18,6 +18,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # runner 只有 ~14GB 可用，CUDA/torch 镜像解压必然爆盘；
+      # 删除预装大块软件腾出 ~25GB
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeComparison \
+            /usr/local/share/boost /usr/lib/jvm
+          sudo docker image prune -af
+          df -h /
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
