@@ -1,5 +1,6 @@
 import base64
 import io
+import urllib.request
 import random
 import re
 
@@ -57,7 +58,21 @@ def handler(job):
 
     buffer = io.BytesIO()
     sf.write(buffer, song.audio, song.sample_rate, format="FLAC")
-    audio_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    flac = buffer.getvalue()
+
+    # RunPod /run results are capped at ~10 MB. When the caller provides a signed
+    # upload URL, PUT the FLAC there and return a small result instead.
+    uploaded = False
+    upload_url = inp.get("upload_url")
+    if isinstance(upload_url, str) and upload_url.startswith("https://"):
+        try:
+            req = urllib.request.Request(upload_url, data=flac, method="PUT",
+                                         headers={"Content-Type": "audio/flac", "User-Agent": "yue2-worker/1.4"})
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                uploaded = 200 <= resp.status < 300
+        except Exception as e:  # fall back to inline base64
+            print(f"upload failed: {e}")
+    audio_b64 = None if uploaded else base64.b64encode(flac).decode("utf-8")
     try:
         abc = song.abc
     except Exception:
@@ -65,6 +80,9 @@ def handler(job):
     return {
         "status": "success",
         "audio_base64": audio_b64,
+        "audio_uploaded": uploaded,
+        "upload_key": inp.get("upload_key") if uploaded else None,
+        "bytes": len(flac),
         "format": "flac",
         "abc": abc,
         "seed": seed,
@@ -72,7 +90,7 @@ def handler(job):
         "instrumental": instrumental,
         "duration": round(len(song.audio) / song.sample_rate, 2),
         "truncated": getattr(song, "truncated", None),
-        "worker_version": "v1.3",
+        "worker_version": "v1.4",
     }
 
 
