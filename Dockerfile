@@ -15,6 +15,15 @@ COPY . .
 # runpod.serverless.start({"handler": handler}).
 RUN python3.11 -m pip install --no-cache-dir . runpod hf_transfer
 
+# Pre-download the instrumental KTO LoRA adapter (70 MB) into the image so cold
+# starts never hit Hugging Face. The base model itself is still resolved at
+# first start and cached by the worker's HF cache.
+ENV HF_HUB_ENABLE_HF_TRANSFER=1
+RUN mkdir -p /workspace/models/loras/instrumental-kto && \
+    python3.11 -c "from huggingface_hub import hf_hub_download; \
+print(hf_hub_download('stevensu/YuE2-3B-instrumental-kto-lora', 'adapter.safetensors', \
+                     local_dir='/workspace/models/loras/instrumental-kto'))"
+
 # RunPod serverless runs this command; handler.py loads the YuE2 model from
 # Hugging Face at first start and calls runpod.serverless.start().
 CMD ["python3.11", "-u", "handler.py"]
